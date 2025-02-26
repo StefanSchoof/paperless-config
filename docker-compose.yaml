@@ -73,6 +73,8 @@ services:
       - AZCOPY_SPA_APPLICATION_ID
       - AZCOPY_SPA_CLIENT_SECRET
       - AZCOPY_TENANT_ID
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
 
   backupdb:
     image: postgres:16
