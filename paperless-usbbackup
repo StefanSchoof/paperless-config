@@ -1,0 +1,12 @@
+#!/bin/bash
+touch /home/pi/paperless/usbbackup
+# enable the led on the raspberry pi to indicate that the backup is in progress
+echo none > /sys/class/leds/PWR/trigger
+echo 1 > /sys/class/leds/PWR/brightness
+
+mount /dev/sda1
+sudo -u pi /usr/bin/docker compose -f /home/pi/paperless/docker-compose.yaml up backupdb backupfiles
+umount /dev/sda1
+
+# disable the led on the raspberry pi to indicate that the backup is complete
+echo mmc0 > /sys/class/leds/PWR/trigger

@@ -1,0 +1,4 @@
+@daily /usr/bin/crontab -l > $HOME/.crontab
+@daily /usr/bin/find /home/pi/paperless/usbbackup -mtime +13
+@daily /usr/bin/find /home/pi/paperless/azbackup -mtime +2
+27 3 * * * /usr/bin/chronic /usr/bin/docker compose -f /home/pi/paperless/docker-compose.yaml up backup && touch /home/pi/paperless/azbackup

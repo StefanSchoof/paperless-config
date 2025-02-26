@@ -1,3 +1,5 @@
 .env
 inbox/
 docker-compose.env
+azbackup
+usbbackup
