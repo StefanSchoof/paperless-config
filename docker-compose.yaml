@@ -92,15 +92,7 @@ services:
 volumes:
   data:
     name: data
-    driver_opts:
-      type: "cifs"
-      o: "username=paperless,password=$SHARE_PW,vers=3.0,noserverino,uid=1000,gid=1000"
-      device: "//192.168.178.1/FRITZ.NAS/WD-ExtHDD1021-01/papperless-docker/data"
   media:
     name: media
-    driver_opts:
-      type: "cifs"
-      o: "username=paperless,password=$SHARE_PW,vers=3.0,noserverino,uid=1000,gid=1000"
-      device: "//192.168.178.1/FRITZ.NAS/WD-ExtHDD1021-01/papperless-docker/media"
   redisdata:
   export:
