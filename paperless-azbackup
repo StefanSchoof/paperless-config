@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+/usr/bin/docker compose -f /home/pi/paperless/docker-compose.yaml exec paperless document_exporter ../export
+/usr/bin/docker compose -f /home/pi/paperless/docker-compose.yaml up backup 
+touch /home/pi/paperless/azbackup

@@ -43,7 +43,7 @@ services:
     volumes:
       - data:/usr/src/paperless/data
       - media:/usr/src/paperless/media
-      - ./export:/usr/src/paperless/export
+      - export:/usr/src/paperless/export
       - ./inbox:/usr/src/paperless/consume
     env_file: docker-compose.env
     environment:
@@ -60,14 +60,12 @@ services:
       context: .
       dockerfile: azcopy.dockerfile
     volumes:
-      - data:/usr/src/paperless/data
-      - media:/usr/src/paperless/media
+      - export:/usr/src/paperless/export
     command:
       - /bin/sh
       - -c
       - |
-        azcopy sync "/usr/src/paperless/data" "$AZURE_STORAGE_URL/paperless-data" --delete-destination=true
-        azcopy sync "/usr/src/paperless/media" "$AZURE_STORAGE_URL/paperless-media" --delete-destination=true
+        azcopy sync "/usr/src/paperless/export" "$AZURE_STORAGE_URL/paperless-export" --delete-destination=true
     environment:
       - AZCOPY_AUTO_LOGIN_TYPE=SPN
       - AZCOPY_SPA_APPLICATION_ID
@@ -76,35 +74,19 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
 
-  backupdb:
-    image: postgres:16
-    volumes:
-      - /mnt/usb:/mnt/usb
-    command:
-      - /bin/sh
-      - -c
-      - |
-        if [ -f "/mnt/usb/usb" ]; then
-          PGPASSWORD=$PAPERLESS_DBPASS pg_dump -U $PAPERLESS_DBUSER -h $PAPERLESS_DBHOST paperless --no-owner --no-privileges -v -f /mnt/usb/paperless.sql
-        fi
-
   backupfiles:
     build:
       context: .
       dockerfile: rsync.dockerfile
     volumes:
-      - data:/usr/src/paperless/data
-      - media:/usr/src/paperless/media
+      - export:/usr/src/paperless/export
       - /mnt/usb:/mnt/usb
     command:
       - /bin/sh
       - -c
       - |
         if [ -f "/mnt/usb/usb" ]; then
-          rsync -av --delete /usr/src/paperless/data/ /mnt/usb/paperless-data
-          echo backup data
-          rsync -av --delete /usr/src/paperless/media/ /mnt/usb/paperless-media
-          echo backup media
+          rsync -av --delete /usr/src/paperless/export/ /mnt/usb/paperless-export
         fi
 
 volumes:
@@ -121,3 +103,4 @@ volumes:
       o: "username=paperless,password=$SHARE_PW,vers=3.0,noserverino,uid=1000,gid=1000"
       device: "//192.168.178.1/FRITZ.NAS/WD-ExtHDD1021-01/papperless-docker/media"
   redisdata:
+  export:
