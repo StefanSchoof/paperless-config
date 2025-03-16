@@ -3,3 +3,5 @@ inbox/
 docker-compose.env
 azbackup
 usbbackup
+.blobfuse-env.sh
+.borg-passphrase

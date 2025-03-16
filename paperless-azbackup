@@ -1,5 +1,61 @@
 #!/bin/bash
 set -e
 /usr/bin/docker compose -f /home/pi/paperless/docker-compose.yaml exec paperless document_exporter ../export
-/usr/bin/docker compose -f /home/pi/paperless/docker-compose.yaml up backup 
+# borg backup absed on https://borgbackup.readthedocs.io/en/stable/quickstart.html#automating-backups
+export BORG_REPO=/mnt/paperless-backup
+export BORG_PASSPHRASE=$(cat /home/pi/paperless/.borg-passphrase)
+info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
+trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
+info "Starting backup"
+borg create                         \
+    --verbose                       \
+    --filter AME                    \
+    --list                          \
+    --stats                         \
+    --show-rc                       \
+    --compression lz4               \
+    --exclude-caches                \
+                                    \
+    ::'{hostname}-{now}'            \
+    /mnt/usbdisk/paperless-export
+    
+
+backup_exit=$?
+
+# Use the `prune` subcommand to maintain 7 daily, 4 weekly and 6 monthly
+# archives of THIS machine. The '{hostname}-*' matching is very important to
+# limit prune's operation to this machine's archives and not apply to
+# other machines' archives also:
+
+borg prune                          \
+    --list                          \
+    --glob-archives '{hostname}-*'  \
+    --show-rc                       \
+    --keep-daily    7               \
+    --keep-weekly   4               \
+    --keep-monthly  6
+    
+prune_exit=$?
+
+# actually free repo disk space by compacting segments
+
+info "Compacting repository"
+
+borg compact
+
+compact_exit=$?
+
+# use highest exit code as global exit code
+global_exit=$(( backup_exit > prune_exit ? backup_exit : prune_exit ))
+global_exit=$(( compact_exit > global_exit ? compact_exit : global_exit ))
+
+if [ ${global_exit} -eq 0 ]; then
+    info "Backup, Prune, and Compact finished successfully"
+elif [ ${global_exit} -eq 1 ]; then
+    info "Backup, Prune, and/or Compact finished with warnings"
+else
+    info "Backup, Prune, and/or Compact finished with errors"
+fi
+
 touch /home/pi/paperless/azbackup
+exit ${global_exit}

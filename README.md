@@ -13,3 +13,14 @@ A udev rule that runs on usb connect. Shows via led that it is running.
 Notfication requires a mail sender configured.
 
 1. At line from `.contab` to `crontab -e`
+
+`.blobfuse-env.sh`
+
+```
+export AZURE_STORAGE_ACCOUNT=
+export AZURE_STORAGE_SPN_CLIENT_ID=
+export AZURE_STORAGE_SPN_TENANT_ID=
+xport AZURE_STORAGE_SPN_CLIENT_SECRET=
+```
+
+`.borg-passphrase` a file with the borg backup passphrase.
