@@ -33,6 +33,16 @@ services:
     volumes:
       - redisdata:/data
 
+  db:
+    image: docker.io/library/postgres:16
+    restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: paperless
+      POSTGRES_USER: paperless
+      POSTGRES_PASSWORD: paperless
+
   paperless:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
@@ -48,49 +58,14 @@ services:
     env_file: docker-compose.env
     environment:
       - PAPERLESS_REDIS=redis://broker:6379
-      - PAPERLESS_DBHOST
-      - PAPERLESS_DBUSER
-      - PAPERLESS_DBPASS
+      - PAPERLESS_DBHOST=db
       - PAPERLESS_FILENAME_FORMAT={{ correspondent }}/{{ created_year }}/{{ title }}
     labels:
       - "com.centurylinklabs.watchtower.monitor-only=true"
 
-  backup:
-    build:
-      context: .
-      dockerfile: azcopy.dockerfile
-    volumes:
-      - export:/usr/src/paperless/export
-    command:
-      - /bin/sh
-      - -c
-      - |
-        azcopy sync "/usr/src/paperless/export" "$AZURE_STORAGE_URL/paperless-export" --delete-destination=true
-    environment:
-      - AZCOPY_AUTO_LOGIN_TYPE=SPN
-      - AZCOPY_SPA_APPLICATION_ID
-      - AZCOPY_SPA_CLIENT_SECRET
-      - AZCOPY_TENANT_ID
-    labels:
-      - "com.centurylinklabs.watchtower.enable=false"
-
-  backupfiles:
-    build:
-      context: .
-      dockerfile: rsync.dockerfile
-    volumes:
-      - export:/usr/src/paperless/export
-      - /mnt/usb:/mnt/usb
-    command:
-      - /bin/sh
-      - -c
-      - |
-        if [ -f "/mnt/usb/usb" ]; then
-          rsync -av --delete /usr/src/paperless/export/ /mnt/usb/paperless-export
-        fi
-
 volumes:
   data:
   media:
+  pgdata:
   redisdata:
   export:
