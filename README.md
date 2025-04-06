@@ -20,7 +20,7 @@ Notfication requires a mail sender configured.
 export AZURE_STORAGE_ACCOUNT=
 export AZURE_STORAGE_SPN_CLIENT_ID=
 export AZURE_STORAGE_SPN_TENANT_ID=
-xport AZURE_STORAGE_SPN_CLIENT_SECRET=
+export AZURE_STORAGE_SPN_CLIENT_SECRET=
 ```
 
 `.borg-passphrase` a file with the borg backup passphrase.
