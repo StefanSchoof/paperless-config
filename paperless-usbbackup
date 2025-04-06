@@ -5,7 +5,8 @@ echo none > /sys/class/leds/PWR/trigger
 echo 1 > /sys/class/leds/PWR/brightness
 
 mount /mnt/usb
-sudo -u pi /usr/bin/docker compose -f /home/pi/paperless/docker-compose.yaml up backupfiles
+sudo -u pi /usr/bin/docker compose -f /home/pi/paperless/docker-compose.yaml exec paperless document_exporter ../export --delete
+rsync -a --delete /mnt/usbdisk/paperless-export/ /mnt/usb/paperless-export
 umount /mnt/usb
 
 # disable the led on the raspberry pi to indicate that the backup is complete

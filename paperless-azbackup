@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
-/usr/bin/docker compose -f /home/pi/paperless/docker-compose.yaml exec paperless document_exporter ../export
+# ensure backup disk is mounted
+sudo mount -a
+/usr/bin/docker compose -f /home/pi/paperless/docker-compose.yaml exec paperless document_exporter ../export --delete
 # borg backup absed on https://borgbackup.readthedocs.io/en/stable/quickstart.html#automating-backups
 export BORG_REPO=/mnt/paperless-backup
 export BORG_PASSPHRASE=$(cat /home/pi/paperless/.borg-passphrase)
