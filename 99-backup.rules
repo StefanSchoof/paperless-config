@@ -1,1 +1,1 @@
-KERNEL=="sda1", ATTRS{serial}=="4357951015795342566", SUBSYSTEMS=="usb", ACTION=="add", RUN+="/usr/bin/at now -f /usr/local/bin/paperless-usbbackup"
+KERNEL=="sd?1", ATTRS{serial}=="4357951015795342566", SUBSYSTEMS=="usb", ACTION=="add", RUN+="/usr/bin/at now -f /usr/local/bin/paperless-usbbackup"
