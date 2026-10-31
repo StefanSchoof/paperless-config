@@ -28,16 +28,16 @@
 
 services:
   broker:
-    image: docker.io/library/redis:7
+    image: docker.io/valkey/valkey:9-alpine
     restart: unless-stopped
     volumes:
-      - redisdata:/data
+      - valkeydata:/data
 
   db:
-    image: docker.io/library/postgres:16
+    image: docker.io/library/postgres:18
     restart: unless-stopped
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata18:/var/lib/postgresql
     environment:
       POSTGRES_DB: paperless
       POSTGRES_USER: paperless
@@ -47,6 +47,7 @@ services:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
     depends_on:
+      - db
       - broker
     ports:
       - "8000:8000"
@@ -66,6 +67,5 @@ services:
 volumes:
   data:
   media:
-  pgdata:
-  redisdata:
-  export:
+  pgdata18:
+  valkeydata:

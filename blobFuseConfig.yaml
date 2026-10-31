@@ -1,7 +1,6 @@
 file_cache:
   path: /mnt/usbdisk/blobfusecache/paperless
-  timeout-sec: 120
-  max-size-mb: 4096
+  timeout-sec: 2592000 # 30 days
 
 attr_cache:
   timeout-sec: 7200
